@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { StyleSheet, Button, View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, Button, View, Text, TextInput, TouchableOpacity, Image, Keyboard } from 'react-native';
 export default class HomeScreen extends React.Component {
     static navigationOptions = {
         title: 'LOGIN', // to add letter spacing on Android
@@ -10,66 +10,104 @@ export default class HomeScreen extends React.Component {
         headerTintColor: '#3d0606',
         headerTitleStyle: {
             fontWeight: 'bold',
-        marginLeft: 150
-    },
-};
-render() {
-    return (
-        <View style={styles.container}>
-            <View style={styles.logocontainer}>
-                <Image style={styles.logo}
-                    source={require('../icons/logo.png')}
-                >
-                </Image>
-                <Text style={{ color: '#c0b01d', margin: 5 }}>Account Information</Text>
-            </View>
-            <View style={styles.infocontainer}>
-                <TextInput style={styles.username}
-                    placeholder='Username'
-                    placeholderTextColor='rgba(255,255,255,0.8)'
-                    autoFocus={true}
-                    returnKeyType='next'
-                    autoCorrect={false}//không hiện ra gợi ý khi nhập
-                    onSubmitEditing={() => this.refs.edpassword.focus()}
-                />
-                <TextInput style={styles.passwrod}
-                    placeholder='Password'
-                    placeholderTextColor='rgba(255,255,255,0.8)'
-                    //autoFocus={true}
-                    returnKeyType='next'
-                    autoCorrect={false}//không hiện ra gợi ý khi nhập
-                // onSubmitEditing={() => this.refs.edhoten.focus()}
-                />
-                <View style={styles.button}>
-                    <View style={styles.btndangnhap}>
-                        <TouchableOpacity
-                            onPress={() => this.props.navigation.navigate('Details')}
-                        >
-                            <Text style={{ fontSize: 20, color: 'white', fontWeight: 'bold', textAlign: 'center' }}>SIGN IN</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <View style={styles.btndoimatkhau}>
-                        <TouchableOpacity
-                            onPress={() => this.props.navigation.navigate('DoiMatKhau')}
-                        >
-                            <Text style={{ fontSize: 15, color: '#704608', textAlign: 'center' }}>Forgot your password?</Text>
-                        </TouchableOpacity>
-                    </View>
-                    <View style={styles.btndangky}>
-                        <TouchableOpacity
-                            onPress={() => this.props.navigation.navigate('AddCountNew')}
-                        >
-                            <Text style={{ fontSize: 15, color: '#704608', textAlign: 'center' }}>Registration>></Text>
-                        </TouchableOpacity>
-                    </View>
+            marginLeft: 150
+        },
+    };
+    constructor(props) {
+        super(props);
+        this.state = {
+            username: "",
+            password: "",
+        }
+    }
+    LOGIN() {
+        fetch('http://192.168.1.166/database/login.php', {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                username: this.state.username,
+                password: this.state.password,
+            }),
+        })
+            .then((response) => response.json())
+            .then((responseJson) => {
+               if(responseJson == "true"){
+                   //alert("Login thành công");
+                   this.props.navigation.navigate('DanhSach');
+               }else{
+                   alert("Login thất bại");
+               }
+            })
+            .catch((error) => {
+                console.error(error);
+            }); 
 
+    }
+    render() {
+        return (
+            <View style={styles.container}>
+                <View style={styles.logocontainer}>
+                    <Image style={styles.logo}
+                        source={require('../icons/logo.png')}
+                    >
+                    </Image>
+                    <Text style={{ color: '#c0b01d', margin: 5 }}>Account Information</Text>
                 </View>
-            </View>
-        </View >
-    );
-}
+                <View style={styles.infocontainer}>
+                    <TextInput style={styles.username}
+                        onChangeText={(username) => this.setState({ username })}
+                        value={this.state.username}
+                        placeholder='Username'
+                        placeholderTextColor='rgba(255,255,255,0.8)'
+                        autoFocus={true}
+                        returnKeyType='next'
+                        autoCorrect={false}//không hiện ra gợi ý khi nhập
+                        onSubmitEditing={() => this.refs.edpassword.focus()}
+                    />
+                    <TextInput style={styles.passwrod}
+                        onChangeText={(password) => this.setState({ password })}
+                        value={this.state.password}
+                        placeholder='Password'
+                        placeholderTextColor='rgba(255,255,255,0.8)'
+                        //autoFocus={true}
+                        returnKeyType='next'
+                        secureTextEntry={true}
+                        autoCorrect={false}//không hiện ra gợi ý khi nhập
+                    // onSubmitEditing={() => this.refs.edhoten.focus()}
+                    />
+                    <View style={styles.button}>
+                        <View style={styles.btndangnhap}>
+                            <TouchableOpacity onPress={() => this.LOGIN()}
+                            //onPress={() => this.props.navigation.navigate('DanhSach')}
+                            >
+                                <Text style={{ fontSize: 20, color: 'white', fontWeight: 'bold', textAlign: 'center' }}>SIGN IN</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <View style={styles.btndoimatkhau}>
+                            <TouchableOpacity
+                                onPress={() => this.props.navigation.navigate('DoiMatKhau')}
+                            >
+                                <Text style={{ fontSize: 15, color: 'white', textAlign: 'center' }}>Forgot your password?</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={styles.btndangky}>
+                            <TouchableOpacity
+                                onPress={() => this.props.navigation.navigate('AddCountNew')}
+                            >
+                                <Text style={{ fontSize: 15, color: 'white', textAlign: 'center' }}>Registration>></Text>
+                            </TouchableOpacity>
+                        </View>
+
+                    </View>
+                </View>
+            </View >
+        );
+    }
 }
 const styles = StyleSheet.create({
     container: {

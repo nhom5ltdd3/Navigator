@@ -1,71 +1,100 @@
 import React from 'react';
-import { StyleSheet, Button, View, Text, TouchableOpacity, TextInput, Image } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, TextInput, Image } from 'react-native';
+import DanhSach from './DanhSach';
 export default class DetailsScreen extends React.Component {
   static navigationOptions = {
-    title: 'THÔNG TIN SINH VIÊN', // to add letter spacing on Android
+    title: 'Thông Tin Sinh Viên', // to add letter spacing on Android
     headerStyle: {
-      backgroundColor: '#a3a8bc',
+      backgroundColor: '#0a538b',
     },
-    headerTintColor: '#fb1717c7',
+    headerTintColor: 'white',
     headerTitleStyle: {
-      //fontWeight: 'bold',
       marginLeft: 40
     },
   };
-  onPressAdd() {
-    alert('This is the button');
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      HOTEN: '',
+      ANH: '',
+      LOP: '',
+    }
   }
+
+  InsertStudent() {
+        fetch('http://192.168.1.166/database/ThemSinhVien.php', {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                HOTEN: this.state.HOTEN,
+                ANH: this.state.ANH,
+                LOP: this.state.LOP,
+            }),
+        })
+            .then((responseJson) => {
+                alert("Tạo tài khoản thành công");
+                DanhSach.push();
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+  }
+
   render() {
     return (
       <View style={styles.container}>
         <View style={styles.logocontainer}>
           <Image style={styles.logo}
-            source={require('../icons/iconsv.png')}
+            source={require('../icons/TDC.jpg')}
           >
           </Image>
-          <Text style={{ color: '#c0b01d', margin: 5 }}>Information Students</Text>
+          <Text style={{ color: '#c0b01d', margin: 5 }}>fit.edu.vn</Text>
 
         </View>
         <View style={styles.infocontainer}>
-          <TextInput style={styles.masv}
-            placeholder='Mã sinh viên'
-            placeholderTextColor='rgba(255,255,255,0.8)'
-            autoFocus={true}
-            returnKeyType='next'
-            autoCorrect={false}//không hiện ra gợi ý khi nhập
-            onSubmitEditing={() => this.refs.edhoten.focus()}
-          />
           <TextInput style={styles.hoten}
+            onChangeText={(HOTEN) => this.setState({ HOTEN })}
+            value={this.state.HOTEN}
             placeholder='Họ tên sinh viên'
-            placeholderTextColor='rgba(255,255,255,0.8)'
+            placeholderTextColor='red'
             returnKeyType='next'
             autoCorrect={false}
             ref={"edhoten"}
             onSubmitEditing={() => this.refs.edlop.focus()}
           />
+          <TextInput style={styles.hinh}
+            onChangeText={(ANH) => this.setState({ ANH })}
+            value={this.state.ANH}
+            placeholder='Ảnh'
+            placeholderTextColor='red'
+            returnKeyType='next'
+            autoCorrect={false}
+            ref={"edanh"}
+          />
           <TextInput style={styles.lop}
+            onChangeText={(LOP) => this.setState({ LOP })}
+            value={this.state.LOP}
             placeholder='Lớp'
-            placeholderTextColor='rgba(255,255,255,0.8)'
+            placeholderTextColor='red'
             returnKeyType='next'
             autoCorrect={false}
             ref={"edlop"}
-            onSubmitEditing={() => this.refs.edgioitinh.focus()}
+            onSubmitEditing={() => this.refs.edanh.focus()}
           />
           <View style={styles.button}>
             <View style={{ flexDirection: 'column' }}>
               <View style={styles.btnthem}>
                 <TouchableOpacity
-                  onPress={this.onPressAdd}
+                  onPress={() => this.InsertStudent()}
                 >
-                  <Text style={styles.plus}>Add</Text>
-                </TouchableOpacity>
-
-              </View>
-              <View style={styles.btnxoa}>
-                <TouchableOpacity
-                  onPress={() => this.props.navigation.navigate('Monhoc')}
-                >
-                  <Text style={styles.plus}>Delete</Text>
+                  <Image style={styles.plus}
+                    source={require('../icons/add.png')}
+                  >
+                  </Image>
                 </TouchableOpacity>
 
               </View>
@@ -74,18 +103,11 @@ export default class DetailsScreen extends React.Component {
             <View style={{ flexDirection: 'column' }}>
               <View style={styles.btnchitiet}>
                 <TouchableOpacity
-                  onPress={() => this.props.navigation.navigate('DanhSach')}
                 >
-                  <Text style={styles.plus1}>Chi tiết</Text>
-
-                </TouchableOpacity>
-              </View>
-              <View style={styles.btnsua}>
-                <TouchableOpacity
-                   onPress={this.onPressAdd}
-                >
-                  <Text style={styles.plus1}>Edit</Text>
-
+                  <Image style={styles.plus}
+                    source={require('../icons/x-button.png')}
+                  >
+                  </Image>
                 </TouchableOpacity>
               </View>
 
@@ -99,7 +121,7 @@ export default class DetailsScreen extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,// co giản màn hình
-    backgroundColor: '#1a1e2c',
+    backgroundColor: 'white',
   },
   infocontainer: {
     position: 'absolute',
@@ -119,34 +141,24 @@ const styles = StyleSheet.create({
     height: 140
 
   },
-  masv: {
-    borderColor: '#ff1d1d',
-    margin: 10,
-    marginTop: 5,
+  hoten: {
+    borderColor: 'gray',
     borderWidth: 1,
-    marginBottom: 5,
+    marginTop: 5,
     height: 40,
-    backgroundColor: 'rgba(255,255,255,0.2)',
 
   },
-  hoten: {
-    borderColor: '#ff1d1d',
-    margin: 10,
-    marginTop: 5,
+  hinh: {
+    borderColor: 'gray',
     borderWidth: 1,
-    marginBottom: 5,
+    marginTop: 5,
     height: 40,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-
   },
   lop: {
-    borderColor: '#ff1d1d',
-    margin: 10,
-    marginTop: 5,
+    borderColor: 'gray',
     borderWidth: 1,
-    marginBottom: 5,
+    marginTop: 5,
     height: 40,
-    backgroundColor: 'rgba(255,255,255,0.2)',
 
   },
   button: {
@@ -155,48 +167,21 @@ const styles = StyleSheet.create({
 
   },
   btnthem: {
-    borderColor: 'gray',
     width: 150,
-    height: 50,
-    backgroundColor: 'green',
-    margin: 10
-  },
-  btnxoa: {
-    borderColor: 'gray',
-    width: 150,
-    height: 50,
-    backgroundColor: 'tomato',
+    height: 80,
+    marginTop: 10,
     margin: 10
   },
   btnchitiet: {
-    borderColor: 'gray',
     width: 150,
-    height: 50,
-    backgroundColor: '#1f44db',
-    margin: 10
-  },
-  btnsua: {
-    borderColor: 'gray',
-    width: 150,
-    height: 50,
-    backgroundColor: '#879815',
+    height: 80,
+    marginTop: 10,
     margin: 10
   },
   plus: {
-    fontSize: 20,
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-    margin: 10
+    marginTop: 10,
+    marginLeft: 40
 
   },
-  plus1: {
-    fontSize: 20,
-    color: 'white',
-    fontWeight: 'bold',
-    justifyContent: 'center',
-    textAlign: 'center',
-    margin: 10
 
-  }
 });

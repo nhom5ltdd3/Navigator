@@ -1,20 +1,56 @@
 import React from 'react';
-import { StyleSheet, View, FlatList, Text, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, FlatList, Text, Image, TouchableOpacity, TextInput } from 'react-native';
+import DeleteModal from './DeleteModal';
+import UpdateModal from './UpdateModal';
+
+const MenuDS = (props) => (
+    <TouchableOpacity style={{ width: 30 }}
+        onPress={() => { props.navigation.navigate('DanhSach') }}
+        >
+        <Image style={{ margin: 10 }}
+            source={require('../icons/monitor.png')}
+        >
+        </Image>
+    </TouchableOpacity >
+);
+const MenuTC = (props) => (
+    <TouchableOpacity style={{ width: 30, marginLeft: 20 }}
+        onPress={() => { props.navigation.navigate('TrangChu') }}>
+        <Image style={{ margin: 10 }}
+            source={require('../icons/list.png')}
+        >
+        </Image>
+    </TouchableOpacity>
+);
+
+const MenuTK = (props) => (
+    <TextInput style={{ marginLeft: 30, borderWidth: 1, flex: 1, marginRight: 20, backgroundColor: 'white', margin: 5 }}
+        placeholder='Tìm kiếm'
+        placeholderTextColor='#260808'
+        //autoFocus={true}
+        returnKeyType='next'
+        autoCorrect={false}//không hiện ra gợi ý khi nhập
+        onSubmitEditing={() => this.refs.edtimkiem.focus()}
+    />
+);
+const MenuBTTK = (props) => (
+    <TouchableOpacity style={{ width: 20, marginRight: 30 }}>
+        <Image style={{ margin: 10 }}
+            source={require('../icons/magnifying-glass.png')}
+        >
+        </Image>
+    </TouchableOpacity>
+);
+
 export default class DanhSach extends React.Component {
     static navigationOptions = ({ navigation }) => ({
-        title: 'Danh Sách',
-        headerStyle: {
-            backgroundColor: '#9c906e',
-            fontWeight: 'bold',
-        },
-        headerTintColor: '#fff',
-        headerRight:
-            <TouchableOpacity onPress={() => navigation.navigate('Home')}
-                style={{ padding: 15 }}
-            >
-
-                <Text style={{ color: 'white', fontSize: 15, fontWeight: 'bold' }}>Home</Text>
-            </TouchableOpacity>
+        header:
+            <View style={{ backgroundColor: '#0a538b', flexDirection: 'row' }}>
+                <MenuDS navigation={navigation} />
+                <MenuTC navigation={navigation} />
+                <MenuTK navigation={navigation} />
+                <MenuBTTK navigation={navigation} />
+            </View>
     });
 
     constructor(props) {
@@ -25,26 +61,17 @@ export default class DanhSach extends React.Component {
             trang: 1,
         }
     }
-    onPressAdd() {
-        alert('This is the button');
+    DELETEMODAL () {
+        this.refs.deleteModal.showDeleteModal();
+    }
+    UPDATE() {
+        this.refs.updateModal.showUpDateModal();
     }
     render() {
-    return (
+        return (
             <View style={styles.cotainer}>
-                <View style={styles.header}>
-                    <TouchableOpacity style={{ marginRight: 20, marginBottom: 3 }}
-                        onPress={() => {
-                            this.refs.danhsach.scrollToEnd()
-
-                        }}>
-                        <Image
-                            source={require('../icons/trang.png')}
-                        >
-                        </Image>
-                    </TouchableOpacity>
-                </View>
                 <FlatList
-                    ref="danhsach"
+                    //ref="danhsach"
                     refreshing={this.state.refresh}// load xoay dữ liệu trên sv vê true xoay, false dừng
                     onRefresh={() => { this.refresh() }}
                     onEndReached={this.myFunction}
@@ -52,21 +79,39 @@ export default class DanhSach extends React.Component {
                     // onRefresh={() => { this.myFunction() }}
                     data={this.state.mang}
                     renderItem={({ item }) =>
-                        <TouchableOpacity onPress={() => { alert(item.HOTEN) }}>
-                            <View style={styles.title}>
-                                <View style={styles.trai}>
-                                    <Image style={{ width: 100, height: 100, borderRadius: 50 }}
-                                        source={{ uri: item.HINH }} />
-                                </View>
-                                <View style={styles.phai}>
-                                    <Text>{item.HOTEN}</Text>
-                                    <Text>{item.LOP}</Text>
-                                    <Text style={{ color: 'red', margin: 10 }}>{item.key}</Text>
-                                </View>
+                        <View style={styles.title}>
+                            <View style={styles.trai}>
+                                <Image style={{ width: 100, height: 100, borderRadius: 50 }}
+                                    source={{ uri: item.HINH }} />
                             </View>
-                        </TouchableOpacity>
+                            <View style={styles.phai}>
+                                <Text>{item.HOTEN}</Text>
+                                <Text>{item.LOP}</Text>
+                                <Text style={{ color: 'red', margin: 10 }}>{item.key}</Text>
+                            </View>
+                            <View style={styles.delete}>
+                                <TouchableOpacity
+                                    onPress={() => this.DELETEMODAL()}>
+                                    <Image style={{ alignItems: 'flex-end', height: 45, width: 50, marginBottom: 15 }}
+                                        source={require('../icons/delete.jpg')}
+                                    >
+                                    </Image>
+                                </TouchableOpacity>
+                                <TouchableOpacity 
+                                onPress={() => this.UPDATE()}>
+                                    <Image style={{ alignItems: 'flex-end', height: 40, width: 40 }}
+                                        source={require('../icons/images.jpg')}
+                                    >
+                                    </Image>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
                     }
                 />
+                <DeleteModal ref={'deleteModal'} parentFlatList={this} >
+                </DeleteModal>
+                <UpdateModal ref={'updateModal'} parentFlatList={this} >
+                </UpdateModal>
             </View>
         );
     }
@@ -74,7 +119,7 @@ export default class DanhSach extends React.Component {
         this.setState({
             refresh: true
         });
-        fetch('http://192.168.0.129/database/demo2.php')
+        fetch('http://192.168.1.166/database/demo2.php')
             .then((response) => response.json())
             .then((responseJson) => {
                 this.setState({
@@ -88,11 +133,8 @@ export default class DanhSach extends React.Component {
 
     }
     myFunction = () => {
-        //this.setState({
-        // refresh: false
-        //});
         this.setState({ trang: this.state.trang++ });
-        fetch('http://192.168.0.129/database/demo3.php?trang=1')
+        fetch('http://192.168.1.166/database/demo2.php')
             .then((response) => response.json())
             .then((responseJson) => {
                 this.setState({
@@ -105,7 +147,7 @@ export default class DanhSach extends React.Component {
             });
     };
     componentDidMount() {
-        fetch('http://192.168.0.129/database/demo3.php?trang=1')
+        fetch('http://192.168.1.166/database/demo3.php?trang=1')
             .then((response) => response.json())
             .then((responseJson) => {
                 this.setState({
@@ -127,15 +169,6 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         borderColor: '#1d1b1b',
     },
-    header: {
-        //alignItems: 'flex-end',
-        justifyContent: 'flex-end',
-        // marginTop: 5,
-        backgroundColor: '#9c906e',
-        flexDirection: 'row'
-
-    },
-
     title: {
         //alignItems: 'center',
         borderBottomWidth: 1,
@@ -154,4 +187,10 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    delete: {
+        flex: 1,
+        flexDirection: 'column',
+        justifyContent: 'flex-end',
+        alignItems: 'flex-end',
+    }
 });

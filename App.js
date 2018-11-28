@@ -5,17 +5,20 @@ import DetailsScreen from './Components/DetailsScreen';
 import DoiMatKhau from './Components/DoiMatKhau';
 import AddCountNew from './Components/AddCountNew';
 import DanhSach from './Components/DanhSach';
+import TrangChu from './Components/TrangChu';
 import Monhoc from './Components/Monhoc';
-//import MuaHang from './Components/MuaHang';
+import QLDiem from './Components/QLDiem';
 
 const RootStack = createStackNavigator(
   {
     Home: HomeScreen,
-    Details: DetailsScreen,
+    TrangChu:TrangChu,
     DoiMatKhau:DoiMatKhau,
+    QLDiem:QLDiem,
+    Monhoc:Monhoc,
+    Details: DetailsScreen,
     AddCountNew:AddCountNew,
     DanhSach:DanhSach,
-    Monhoc:Monhoc,
   },
   {
     initialRouteName: 'Home',
